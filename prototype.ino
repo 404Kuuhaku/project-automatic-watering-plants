@@ -6,25 +6,54 @@ int seconds = 0;
 int minutes = 0;
 int hours =   0;
 int days = 1;
-bool timerRun = HIGH;
+bool timerRun = LOW;
 unsigned long previousMillis = 0;
 const long interval = 1000;
 
 //all about mode
-//อยู่ในโหมดไหม
-bool modeOn = LOW;
-//โหมดที่เท่าไร
-int mode = 1;
-//ปุ่มกดใน modeOn
+//ปุ่มกดให้ modeOn
 int modeBotton = 26;
-//ลูกศรปรับค่าในmode
-int V_mode = 0;
+int modeBottonState = 0;
+int LastmodeBottonState = 0;
 
 
-//all about time
-int V = 0;
+//โหมดที่เท่าไร
+int mode = 0;
+
+//mode0 ตั้งเวลานาฬิกา
 bool timeOn = LOW;
-int timeBotton = 28;
+int V_mode0 = 0;
+
+
+//mode1 รดน้ำต้นไม้แบบตั้งเวลา
+//ลูกศรปรับค่าในmode1
+bool modeOn1 = LOW;
+int V_mode1 = 0;
+
+int seconds_1setup = 0;
+int minutes_1setup = 0;
+int hours_1setup = 6;
+
+int seconds_2setup = 0;
+int minutes_2setup = 0;
+int hours_2setup = 12;
+
+int seconds_3setup = 0;
+int minutes_3setup = 0;
+int hours_3setup = 18;
+
+int seconds_time_setup = 0;
+int minutes_time_setup = 10;
+int hours_time_setup =   0;
+
+
+
+//mode2
+bool modeOn2 = LOW;
+
+
+
+
 
 
 //SoilSensor
@@ -40,7 +69,7 @@ int SoilSensorPin = A8;
 
 //DHT22
 #include "DHT.h"
-#define DHTPIN 24
+#define DHTPIN 22
 #define DHTTYPE DHT22   // DHT 22  (AM2302), AM2321
 DHT dht(DHTPIN, DHTTYPE);
 unsigned long previousMillis_dht22 = 0;
@@ -101,23 +130,13 @@ void setup()
 void loop(){
     
     timeSystem();
-    lcdBotton();
+    Mode_Botton_System();
+    Time_LCD_Botton();
     Mode_LCD_Botton();
 
     dht22();
     SoilSensor();
-
-
-   
-    //DisplaySystem();
-
-
-
-
-
  
-
-
 
 }
 
@@ -158,8 +177,43 @@ void timeSystem(){
 
 
 
+void Mode_Botton_System(){
 
-void lcdBotton(){
+  modeBottonState = digitalRead(modeBotton);
+  if (modeBottonState != LastmodeBottonState && modeBottonState == HIGH) {
+    lcd.clear();
+    mode = (mode + 1) % 3;
+  }
+  LastmodeBottonState = modeBottonState;
+
+    if(mode == 0){
+        timeOn = HIGH;
+        modeOn1 = LOW;
+        modeOn2 = LOW;
+    }
+    else if(mode == 1){
+        timeOn = LOW;
+        modeOn1 = HIGH;
+        modeOn2 = LOW;
+    }
+    else {
+        timeOn = LOW;
+        modeOn1 = LOW;
+        modeOn2 = HIGH;
+    }
+
+    if(modeOn2 == HIGH){
+        lcd.setCursor(4,1);      
+        lcd.print("MODE 2");
+    }
+
+
+}
+
+
+
+
+void Time_LCD_Botton(){
 
 
     if (timeOn == HIGH)
@@ -169,7 +223,62 @@ void lcdBotton(){
             {
             case btnRIGHT:
                 {
-                        V = (V + 1) % 4;            
+                        V_mode0 = (V_mode0 + 1) % 4;
+
+                        if (V_mode0 == 0){
+                        lcd.setCursor(1,1);      
+                        lcd.print("^");
+
+                        lcd.setCursor(4,1);      
+                        lcd.print(" ");  
+
+                        lcd.setCursor(7,1);      
+                        lcd.print(" ");
+
+                        lcd.setCursor(12,1);      
+                        lcd.print(" ");                    
+                        }
+                        else if(V_mode0==1){
+                        lcd.setCursor(1,1);      
+                        lcd.print(" ");
+
+                        lcd.setCursor(4,1);      
+                        lcd.print("^");  
+
+                        lcd.setCursor(7,1);      
+                        lcd.print(" ");
+
+                        lcd.setCursor(12,1);      
+                        lcd.print(" ");                   
+                        }
+                        else if(V_mode0==2){
+                        lcd.setCursor(1,1);      
+                        lcd.print(" ");
+
+                        lcd.setCursor(4,1);      
+                        lcd.print(" ");  
+
+                        lcd.setCursor(7,1);      
+                        lcd.print("^");
+
+                        lcd.setCursor(12,1);      
+                        lcd.print(" ");                  
+                        }
+                        else {
+                        lcd.setCursor(1,1);      
+                        lcd.print(" ");
+
+                        lcd.setCursor(4,1);      
+                        lcd.print(" ");  
+
+                        lcd.setCursor(7,1);      
+                        lcd.print(" ");
+
+                        lcd.setCursor(12,1);      
+                        lcd.print("^");          
+                        }
+
+
                         delay(300);
                     break;
                 }
@@ -179,8 +288,62 @@ void lcdBotton(){
 
             case btnLEFT:  
                 {
-                    V--;                                                               
-                    if (V < 0)   { V = 3 ; }          
+                    V_mode0--;                                                               
+                    if (V_mode0 < 0)   { V_mode0 = 3 ; } 
+
+                    if (V_mode0 == 0){
+                        lcd.setCursor(1,1);      
+                        lcd.print("^");
+
+                        lcd.setCursor(4,1);      
+                        lcd.print(" ");  
+
+                        lcd.setCursor(7,1);      
+                        lcd.print(" ");
+
+                        lcd.setCursor(12,1);      
+                        lcd.print(" ");                    
+                        }
+                        else if(V_mode0==1){
+                        lcd.setCursor(1,1);      
+                        lcd.print(" ");
+
+                        lcd.setCursor(4,1);      
+                        lcd.print("^");  
+
+                        lcd.setCursor(7,1);      
+                        lcd.print(" ");
+
+                        lcd.setCursor(12,1);      
+                        lcd.print(" ");                   
+                        }
+                        else if(V_mode0==2){
+                        lcd.setCursor(1,1);      
+                        lcd.print(" ");
+
+                        lcd.setCursor(4,1);      
+                        lcd.print(" ");  
+
+                        lcd.setCursor(7,1);      
+                        lcd.print("^");
+
+                        lcd.setCursor(12,1);      
+                        lcd.print(" ");                  
+                        }
+                        else {
+                        lcd.setCursor(1,1);      
+                        lcd.print(" ");
+
+                        lcd.setCursor(4,1);      
+                        lcd.print(" ");  
+
+                        lcd.setCursor(7,1);      
+                        lcd.print(" ");
+
+                        lcd.setCursor(12,1);      
+                        lcd.print("^");          
+                        }
+
                     delay(300);
                     break;
                     
@@ -191,18 +354,18 @@ void lcdBotton(){
 
             case btnUP:      
                 {
-                    if (V == 0){
+                    if (V_mode0 == 0){
                             hours = (hours+1)%24;                          
                         
                         }
 
 
-                    else if(V==1){
+                    else if(V_mode0==1){
                                 minutes = (minutes+1)%60;
 
                             }
 
-                    else if(V==2){
+                    else if(V_mode0==2){
                                 seconds = (seconds+1)%60;
 
                             }
@@ -226,21 +389,21 @@ void lcdBotton(){
 
             case btnDOWN:            
             {
-                if (V == 0){
+                if (V_mode0 == 0){
                             hours--;                          
-                            if (hours <= 0)   { hours = 23; }      
+                            if (hours < 0)   { hours = 23; }      
 
                         }
 
 
-                else if(V==1){
+                else if(V_mode0==1){
                             minutes--;                          
-                            if (minutes <= 0)   { minutes = 59; }
+                            if (minutes < 0)   { minutes = 59; }
                         }
 
-                else if(V==2){
+                else if(V_mode0==2){
                             seconds--;                          
-                            if (seconds <= 0)   { seconds = 59; }
+                            if (seconds < 0)   { seconds = 59; }
                         }
 
                 else {
@@ -272,9 +435,7 @@ void lcdBotton(){
 
         }
 
-                lcd.clear();
                 lcd.setCursor(0, 0);
-                //ต้องมาเพิ่มวัน
                 if (hours < 10) {
                         lcd.print("0");
                     }
@@ -317,22 +478,7 @@ void lcdBotton(){
                         lcd.print("Sun");      
                         }
 
-                if (V == 0){
-                        lcd.setCursor(1,1);      
-                        lcd.print("^");                   
-                        }
-                        else if(V==1){
-                        lcd.setCursor(4,1);      
-                        lcd.print("^");                  
-                        }
-                        else if(V==2){
-                        lcd.setCursor(7,1);      
-                        lcd.print("^");                  
-                        }
-                        else {
-                        lcd.setCursor(12,1);      
-                        lcd.print("^");          
-                        }
+                
 
 
 
@@ -348,14 +494,47 @@ void lcdBotton(){
 
 
 void Mode_LCD_Botton(){
-    if (modeOn == HIGH)
+    if (modeOn1 == HIGH)
     {
         lcd_key = read_LCD_buttons();      
         switch (lcd_key)  
             {
             case btnRIGHT:
                 {
-                    V_mode = (V_mode + 1) % 3;
+                    V_mode1 = (V_mode1 + 1) % 12;
+
+                    if(V_mode1 == 0 || V_mode1 == 3 || V_mode1 == 6 || V_mode1 == 9){
+                        lcd.setCursor(9,1);              
+                        lcd.print("^");
+
+                        lcd.setCursor(12,1);
+                        lcd.print(" ");
+
+                        lcd.setCursor(15,1);
+                        lcd.print(" ");
+                    }   
+                    else if(V_mode1 == 1 || V_mode1 == 4  || V_mode1 == 7 || V_mode1 == 10){
+                        lcd.setCursor(9,1);              
+                        lcd.print(" ");
+
+                        lcd.setCursor(12,1);
+                        lcd.print("^");
+
+                        lcd.setCursor(15,1);
+                        lcd.print(" ");
+                    }
+                    else if(V_mode1 == 2 || V_mode1 == 5  || V_mode1 == 8 || V_mode1 == 11){
+                        lcd.setCursor(9,1);              
+                        lcd.print(" ");
+
+                        lcd.setCursor(12,1);
+                        lcd.print(" ");
+
+                        lcd.setCursor(15,1);
+                        lcd.print("^");
+                    }
+
+                    
                     
                     delay(300);
                     break;
@@ -366,7 +545,40 @@ void Mode_LCD_Botton(){
 
             case btnLEFT:  
                 {
-                    
+                    V_mode1--;                                                               
+                    if (V_mode1 < 0)   { V_mode1 = 11 ; }
+
+                     if(V_mode1 == 0 || V_mode1 == 3 || V_mode1 == 6 || V_mode1 == 9){
+                        lcd.setCursor(9,1);              
+                        lcd.print("^");
+
+                        lcd.setCursor(12,1);
+                        lcd.print(" ");
+
+                        lcd.setCursor(15,1);
+                        lcd.print(" ");
+                    }   
+                    else if(V_mode1 == 1 || V_mode1 == 4  || V_mode1 == 7 || V_mode1 == 10){
+                        lcd.setCursor(9,1);              
+                        lcd.print(" ");
+
+                        lcd.setCursor(12,1);
+                        lcd.print("^");
+
+                        lcd.setCursor(15,1);
+                        lcd.print(" ");
+                    }
+                    else if(V_mode1 == 2 || V_mode1 == 5  || V_mode1 == 8 || V_mode1 == 11){
+                        lcd.setCursor(9,1);              
+                        lcd.print(" ");
+
+                        lcd.setCursor(12,1);
+                        lcd.print(" ");
+
+                        lcd.setCursor(15,1);
+                        lcd.print("^");
+                    }
+
                     delay(300);
                     break;
                     
@@ -377,17 +589,68 @@ void Mode_LCD_Botton(){
 
             case btnUP:      
                 {
-                    if (V_mode == 0){
-                        mode ++;
-                        if (mode > 3) {
-                            mode = 1;
-                        }                           
+                    if (V_mode1 == 0){
+                            hours_1setup = (hours_1setup+1)%24;                          
                         
                         }
 
 
-                    else if(V_mode==1){
-                               
+                    else if(V_mode1==1){
+                                minutes_1setup = (minutes_1setup+1)%60;
+
+                            }
+
+                    else if(V_mode1==2){
+                                seconds_1setup = (seconds_1setup+1)%60;
+
+                            }
+                    
+                    
+                    else if (V_mode1 == 3){
+                            hours_2setup = (hours_2setup+1)%24;                          
+                        
+                        }
+
+
+                    else if(V_mode1==4){
+                                minutes_2setup = (minutes_2setup+1)%60;
+
+                            }
+
+                    else if(V_mode1==5){
+                                seconds_2setup = (seconds_2setup+1)%60;
+
+                            }
+
+                    else if (V_mode1 == 6){
+                            hours_3setup = (hours_3setup+1)%24;                          
+                        
+                        }
+
+
+                    else if(V_mode1==7){
+                                minutes_3setup = (minutes_3setup+1)%60;
+
+                            }
+
+                    else if(V_mode1==8){
+                                seconds_3setup = (seconds_3setup+1)%60;
+
+                            }
+
+                    else if (V_mode1 == 9){
+                            hours_time_setup = (hours_time_setup+1)%24;                          
+                        
+                        }
+
+
+                    else if(V_mode1==10){
+                                minutes_time_setup = (minutes_time_setup+1)%60;
+
+                            }
+
+                    else if(V_mode1==11){
+                                seconds_time_setup = (seconds_time_setup+1)%60;
 
                             }
 
@@ -406,6 +669,87 @@ void Mode_LCD_Botton(){
             case btnDOWN:            
             {
                 
+                if (V_mode1 == 0){
+                            hours_1setup-- ;
+                            if (hours_1setup <0 ) {hours_1setup =23;}                      
+                        
+                        }
+
+
+                    else if(V_mode1==1){
+                                minutes_1setup--;
+                                if(minutes_1setup<0) {minutes_1setup=59;}
+
+                            }
+
+                    else if(V_mode1==2){
+                                seconds_1setup--;
+                                if(seconds_1setup<0) {seconds_1setup=59;}
+
+                            }
+                    
+                    
+                    else if (V_mode1 == 3){
+                            hours_2setup-- ;
+                            if (hours_2setup <0 ) {hours_2setup =23;}                          
+                        
+                        }
+
+
+                    else if(V_mode1==4){
+                                minutes_2setup--;
+                                if(minutes_2setup<0) {minutes_2setup=59;}
+
+                            }
+
+                    else if(V_mode1==5){
+                                seconds_2setup--;
+                                if(seconds_2setup<0) {seconds_2setup=59;}
+
+                            }
+
+                     else if (V_mode1 == 6){
+                            hours_3setup-- ;
+                            if (hours_3setup <0 ) {hours_3setup =23;}                          
+                        
+                        }
+
+
+                    else if(V_mode1==7){
+                                minutes_3setup--;
+                                if(minutes_3setup<0) {minutes_3setup=59;}
+
+                            }
+
+                    else if(V_mode1==8){
+                                seconds_3setup--;
+                                if(seconds_3setup<0) {seconds_3setup=59;}
+
+                            }
+
+                     else if (V_mode1 == 9){
+                            hours_time_setup-- ;
+                            if (hours_time_setup <0 ) {hours_time_setup =23;}                          
+                        
+                        }
+
+
+                    else if(V_mode1==10){
+                                minutes_time_setup--;
+                                if(minutes_time_setup<0) {minutes_time_setup=59;}
+
+                            }
+
+                    else if(V_mode1==11){
+                                seconds_time_setup--;
+                                if(seconds_time_setup<0) {seconds_time_setup=59;}
+
+                            }
+
+
+                    else {
+                                                          
+                            }
                 delay(300);
                 break;      
             }
@@ -422,27 +766,104 @@ void Mode_LCD_Botton(){
 
 
         }
-    lcd.clear();
-    lcd.setCursor(0,0);              
-    lcd.print("Mode");
-    lcd.print(":");
-    lcd.print(mode);
-    lcd.print(" ");
-    lcd.print("time");
-    lcd.print(":");
+    
 
-            if(V_mode == 0){
-                        lcd.setCursor(5,1);              
-                        lcd.print("^");
-                    }   
-                    else if(V_mode == 1){
-                        lcd.setCursor(12,1);
-                        lcd.print("^");
-                    }
-                    else if(V_mode == 2){
-                        lcd.setCursor(15,1);
-                        lcd.print("^");
-                    }
+    if (V_mode1<=2){
+    lcd.setCursor(0,0);              
+    lcd.print("1stTime ");
+            if (hours_1setup < 10) {
+                                lcd.print("0");
+                            }
+                        lcd.print(hours_1setup);
+
+                        lcd.print(":");
+
+            if (minutes_1setup < 10) {
+                                lcd.print("0");
+                            }
+                        lcd.print(minutes_1setup);
+
+                        lcd.print(":");
+
+            if (seconds_1setup < 10){
+                                lcd.print("0");
+                            }
+                        lcd.print(seconds_1setup);
+    }
+
+
+    if (V_mode1>2 && V_mode1<=5){
+    lcd.setCursor(0,0);              
+    lcd.print("2ndTime ");
+            if (hours_2setup < 10) {
+                                lcd.print("0");
+                            }
+                        lcd.print(hours_2setup);
+
+                        lcd.print(":");
+
+            if (minutes_2setup < 10) {
+                                lcd.print("0");
+                            }
+                        lcd.print(minutes_2setup);
+
+                        lcd.print(":");
+
+            if (seconds_2setup < 10){
+                                lcd.print("0");
+                            }
+                        lcd.print(seconds_2setup);
+    }
+    
+
+    if (V_mode1>5 && V_mode1<=8){
+    lcd.setCursor(0,0);              
+    lcd.print("3rdTime ");
+            if (hours_3setup < 10) {
+                                lcd.print("0");
+                            }
+                        lcd.print(hours_3setup);
+
+                        lcd.print(":");
+
+            if (minutes_3setup < 10) {
+                                lcd.print("0");
+                            }
+                        lcd.print(minutes_3setup);
+
+                        lcd.print(":");
+
+            if (seconds_3setup < 10){
+                                lcd.print("0");
+                            }
+                        lcd.print(seconds_3setup);
+    }
+
+    if (V_mode1>8 && V_mode1<=11){
+    lcd.setCursor(0,0);              
+    lcd.print("TimeSet ");
+            if (hours_time_setup < 10) {
+                                lcd.print("0");
+                            }
+                        lcd.print(hours_time_setup);
+
+                        lcd.print(":");
+
+            if (minutes_time_setup < 10) {
+                                lcd.print("0");
+                            }
+                        lcd.print(minutes_time_setup);
+
+                        lcd.print(":");
+
+            if (seconds_time_setup < 10){
+                                lcd.print("0");
+                            }
+                        lcd.print(seconds_time_setup);
+    }
+    
+
+            
 
     
     }
@@ -525,22 +946,3 @@ void SoilSensor(){
 }
 
 
-
-
-void DisplaySystem(){
-    lcd.clear();
-    lcd.setCursor(0,0);              
-    lcd.print("Hu:");
-    lcd.print(h);
-    lcd.print("% Temp:");
-    lcd.print(t);
-    lcd.print("°C");
-    lcd.setCursor(0,1);
-    lcd.print("Soil Hu:");
-    lcd.print(SoilHumidity);
-    lcd.print("%");
-    
-   
-
-
-}
