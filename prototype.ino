@@ -6,30 +6,36 @@ int seconds = 0;
 int minutes = 0;
 int hours =   0;
 int days = 1;
-bool timerOn = LOW;
+bool timerRun = HIGH;
 unsigned long previousMillis = 0;
 const long interval = 1000;
 
+//all about mode
+//อยู่ในโหมดไหม
+bool modeOn = LOW;
+//โหมดที่เท่าไร
+int mode = 1;
+//ปุ่มกดใน modeOn
+int modeBotton = 26;
+//ลูกศรปรับค่าในmode
+int V_mode = 0;
 
-//ui
+
+//all about time
 int V = 0;
+bool timeOn = LOW;
+int timeBotton = 28;
 
 
-//mode
-int mode = 0;
-int preset = 0;
-int save = 0;
-
-
-//accessories
+//SoilSensor
 int SoilSensorValue;
 int SoilHumidity;
-
-//pinmode
-int modeBotton = 26;
-int presetBotton = 28;
-int saveBotton = 30
+unsigned long previousMillis_SoilSensor = 0;
+const long interval_SoilSensor = 500;
 int SoilSensorPin = A8;
+
+
+
 
 
 //DHT22
@@ -37,6 +43,8 @@ int SoilSensorPin = A8;
 #define DHTPIN 24
 #define DHTTYPE DHT22   // DHT 22  (AM2302), AM2321
 DHT dht(DHTPIN, DHTTYPE);
+unsigned long previousMillis_dht22 = 0;
+const long interval_dht22 = 500;
 
 //จอ
 #include <LiquidCrystal.h>
@@ -83,48 +91,27 @@ void setup()
  dht.begin();
 
  pinMode(modeBotton,INPUT);
- pinMode(presetBotton,INPUT);
- pinMode(saveBotton,INPUT);
+ 
  
  lcd.begin(16, 2);
- lcd.setCursor(1,1);        
- lcd.print("^");  
+  
 
 }
  
 void loop(){
     
-    timeSytem();
+    timeSystem();
     lcdBotton();
+    Mode_LCD_Botton();
 
     dht22();
     SoilSensor();
 
 
-    ModeSytem();
+   
+    //DisplaySystem();
 
 
-    //ต้องย้ายไปใน void ใหม่
-    lcd.setCursor(0, 0);
-    //ต้องมาเพิ่มวัน
-    if (hours < 10) {
-            lcd.print("0");
-        }
-    lcd.print(hours);
-
-    lcd.print(":");
-
-    if (minutes < 10) {
-            lcd.print("0");
-        }
-    lcd.print(minutes);
-
-    lcd.print(":");
-
-    if (seconds < 10){
-            lcd.print("0");
-        }
-    lcd.print(seconds);
 
 
 
@@ -140,11 +127,11 @@ void loop(){
 
 
 
-void timeSytem(){
+void timeSystem(){
     unsigned long currentMillis = millis();
     if (currentMillis - previousMillis >= interval) {
             previousMillis = currentMillis;
-            if (timerOn) {
+            if (timerRun) {
                 seconds++;
                 
                 if (seconds == 60) {
@@ -174,54 +161,15 @@ void timeSytem(){
 
 void lcdBotton(){
 
+
+    if (timeOn == HIGH)
+    {
     lcd_key = read_LCD_buttons();      
     switch (lcd_key)  
             {
             case btnRIGHT:
                 {
-                        V = (V + 1) % 3;            
-                        if (V == 0){
-                        lcd.setCursor(1,1);      
-                        lcd.print("^");          
-
-
-                        lcd.setCursor(4,1);      
-                        lcd.print(" ");          
-
-
-                        lcd.setCursor(7,1);      
-                        lcd.print(" ");          
-                        }
-
-
-                        else if(V==1){
-                        lcd.setCursor(1,1);      
-                        lcd.print(" ");          
-
-
-                        lcd.setCursor(4,1);      
-                        lcd.print("^");          
-
-
-                        lcd.setCursor(7,1);      
-                        lcd.print(" ");          
-                        }
-
-
-                        else {
-                        lcd.setCursor(1,1);      
-                        lcd.print(" ");          
-
-
-                        lcd.setCursor(4,1);      
-                        lcd.print(" ");          
-
-
-                        lcd.setCursor(7,1);      
-                        lcd.print("^");          
-                        }
-
-
+                        V = (V + 1) % 4;            
                         delay(300);
                     break;
                 }
@@ -232,50 +180,7 @@ void lcdBotton(){
             case btnLEFT:  
                 {
                     V--;                                                               
-                    if (V < 0)   { V = 2 ; }          
-
-                        if (V == 0){
-                        lcd.setCursor(1,1);              
-                        lcd.print("^");
-
-
-                        lcd.setCursor(4,1);
-                        lcd.print(" ");
-
-
-                        lcd.setCursor(7,1);
-                        lcd.print(" ");
-                        }
-
-
-                        else if(V==1){
-                        lcd.setCursor(1,1);
-                        lcd.print(" ");
-
-
-                        lcd.setCursor(4,1);
-                        lcd.print("^");
-
-
-                        lcd.setCursor(7,1);
-                        lcd.print(" ");
-                        }
-
-
-                        else {
-                        lcd.setCursor(1,1);
-                        lcd.print(" ");
-
-
-                        lcd.setCursor(4,1);
-                        lcd.print(" ");
-
-
-                        lcd.setCursor(7,1);
-                        lcd.print("^");
-                        }
-
-
+                    if (V < 0)   { V = 3 ; }          
                     delay(300);
                     break;
                     
@@ -297,9 +202,18 @@ void lcdBotton(){
 
                             }
 
+                    else if(V==2){
+                                seconds = (seconds+1)%60;
+
+                            }
 
                     else {
-                                seconds = (seconds+1)%60;                          
+                                days++;
+                                if (days>7)
+                                {
+                                    days=1;
+                                }
+                                                        
                             }
                     delay(300);
 
@@ -324,10 +238,17 @@ void lcdBotton(){
                             if (minutes <= 0)   { minutes = 59; }
                         }
 
-
-                else {
+                else if(V==2){
                             seconds--;                          
                             if (seconds <= 0)   { seconds = 59; }
+                        }
+
+                else {
+                            days--;
+                                if (days<1)
+                                {
+                                    days=7;
+                                }
                         }
                 delay(300);
 
@@ -339,7 +260,7 @@ void lcdBotton(){
 
             case btnSELECT:          
                 {
-                    timerOn = HIGH;
+                    timerRun = HIGH;
                     delay(300);      
                     break;                  
                 }
@@ -351,46 +272,238 @@ void lcdBotton(){
 
         }
 
+                lcd.clear();
+                lcd.setCursor(0, 0);
+                //ต้องมาเพิ่มวัน
+                if (hours < 10) {
+                        lcd.print("0");
+                    }
+                lcd.print(hours);
+
+                lcd.print(":");
+
+                if (minutes < 10) {
+                        lcd.print("0");
+                    }
+                lcd.print(minutes);
+
+                lcd.print(":");
+
+                if (seconds < 10){
+                        lcd.print("0");
+                    }
+                lcd.print(seconds);
+
+                lcd.print("  ");
+                if (days == 1){      
+                        lcd.print("Mon");                   
+                        }
+                        else if(days==2){
+                        lcd.print("Tue");                
+                        }
+                        else if(days==3){
+                        lcd.print("Wen");                
+                        }
+                        else if(days==4){
+                        lcd.print("Thu");                
+                        }
+                        else if(days==5){
+                        lcd.print("Fri");                
+                        }
+                        else if(days==6){
+                        lcd.print("Sat");                
+                        }
+                        else {
+                        lcd.print("Sun");      
+                        }
+
+                if (V == 0){
+                        lcd.setCursor(1,1);      
+                        lcd.print("^");                   
+                        }
+                        else if(V==1){
+                        lcd.setCursor(4,1);      
+                        lcd.print("^");                  
+                        }
+                        else if(V==2){
+                        lcd.setCursor(7,1);      
+                        lcd.print("^");                  
+                        }
+                        else {
+                        lcd.setCursor(12,1);      
+                        lcd.print("^");          
+                        }
+
+
+
+    }
+
+
+
+
 }
 
 
 
 
-void dht22(){
-  delay(200);
-  // Reading temperature or humidity takes about 250 milliseconds!
-  // Sensor readings may also be up to 2 seconds 'old' (its a very slow sensor)
-  float h = dht.readHumidity();
-  // Read temperature as Celsius (the default)
-  float t = dht.readTemperature();
-  // Read temperature as Fahrenheit (isFahrenheit = true)
-  float f = dht.readTemperature(true);
+
+void Mode_LCD_Botton(){
+    if (modeOn == HIGH)
+    {
+        lcd_key = read_LCD_buttons();      
+        switch (lcd_key)  
+            {
+            case btnRIGHT:
+                {
+                    V_mode = (V_mode + 1) % 3;
+                    
+                    delay(300);
+                    break;
+                }
 
 
-  // Check if any reads failed and exit early (to try again).
-  if (isnan(h)  ,isnan(t) , isnan(f)) {
-            Serial.println(F("Failed to read from DHT sensor!"));
-            return;
+
+
+            case btnLEFT:  
+                {
+                    
+                    delay(300);
+                    break;
+                    
+                }
+
+
+
+
+            case btnUP:      
+                {
+                    if (V_mode == 0){
+                        mode ++;
+                        if (mode > 3) {
+                            mode = 1;
+                        }                           
+                        
+                        }
+
+
+                    else if(V_mode==1){
+                               
+
+                            }
+
+
+                    else {
+                                                          
+                            }
+                    delay(300);
+                    break;
+                
+                }
+
+
+
+
+            case btnDOWN:            
+            {
+                
+                delay(300);
+                break;      
+            }
+
+
+
+
+            case btnSELECT:          
+                {
+                    
+                    delay(300);      
+                    break;                  
+                }
+
+
         }
+    lcd.clear();
+    lcd.setCursor(0,0);              
+    lcd.print("Mode");
+    lcd.print(":");
+    lcd.print(mode);
+    lcd.print(" ");
+    lcd.print("time");
+    lcd.print(":");
+
+            if(V_mode == 0){
+                        lcd.setCursor(5,1);              
+                        lcd.print("^");
+                    }   
+                    else if(V_mode == 1){
+                        lcd.setCursor(12,1);
+                        lcd.print("^");
+                    }
+                    else if(V_mode == 2){
+                        lcd.setCursor(15,1);
+                        lcd.print("^");
+                    }
+
+    
+    }
+    
+    
 
 
-  // Compute heat index in Fahrenheit (the default)
-  float hif = dht.computeHeatIndex(f, h);
-  // Compute heat index in Celsius (isFahreheit = false)
-  float hic = dht.computeHeatIndex(t, h, false);
+}
 
 
-  Serial.print(F("Humidity: "));
-  Serial.print(h);
-  Serial.print(F("%  Temperature: "));
-  Serial.print(t);
-  Serial.print(F("°C "));
-  Serial.print(f);
-  Serial.print(F("°F  Heat index: "));
-  Serial.print(hic);
-  Serial.print(F("°C "));
-  Serial.print(hif);
-  Serial.println(F("°F"));
+
+
+
+
+
+
+void dht22(){
+    unsigned long currentMillis = millis();
+    if (currentMillis - previousMillis_dht22 >= interval_dht22) {
+            previousMillis_dht22 = currentMillis;
+            //delay(200);
+            // Reading temperature or humidity takes about 250 milliseconds!
+            // Sensor readings may also be up to 2 seconds 'old' (its a very slow sensor)
+            float h = dht.readHumidity();
+            // Read temperature as Celsius (the default)
+            float t = dht.readTemperature();
+            // Read temperature as Fahrenheit (isFahrenheit = true)
+            float f = dht.readTemperature(true);
+
+
+            // Check if any reads failed and exit early (to try again).
+            if (isnan(h)  ,isnan(t) , isnan(f)) {
+                        Serial.println(F("Failed to read from DHT sensor!"));
+                        return;
+                    }
+
+
+            // Compute heat index in Fahrenheit (the default)
+            float hif = dht.computeHeatIndex(f, h);
+            // Compute heat index in Celsius (isFahreheit = false)
+            float hic = dht.computeHeatIndex(t, h, false);
+
+
+            Serial.print(F("Humidity: "));
+            Serial.print(h);
+            Serial.print(F("%  Temperature: "));
+            Serial.print(t);
+            Serial.print(F("°C "));
+            Serial.print(f);
+            Serial.print(F("°F  Heat index: "));
+            Serial.print(hic);
+            Serial.print(F("°C "));
+            Serial.print(hif);
+            Serial.println(F("°F"));
+
+
+            
+           
+
+    }
+    
 
 }
 
@@ -398,30 +511,36 @@ void dht22(){
 
 
 void SoilSensor(){
+    unsigned long currentMillis = millis();
+    if (currentMillis - previousMillis_SoilSensor >= interval_SoilSensor) {
+            previousMillis_SoilSensor = currentMillis;
     SoilSensorValue = analogRead(SoilSensorPin);
     SoilHumidity = map(SoilSensorValue,1023,0,0,100);
     Serial.print("Soil Humidity : ");
     Serial.print(SoilHumidity);
     Serial.println(" %");
-    delay(200);
+    //delay(200);
+
+    }
 }
 
 
 
 
-void ModeSytem(){
-    switch (expression)
-    {
-    case /* constant-expression */:
-        /* code */
-        break;
+void DisplaySystem(){
+    lcd.clear();
+    lcd.setCursor(0,0);              
+    lcd.print("Hu:");
+    lcd.print(h);
+    lcd.print("% Temp:");
+    lcd.print(t);
+    lcd.print("°C");
+    lcd.setCursor(0,1);
+    lcd.print("Soil Hu:");
+    lcd.print(SoilHumidity);
+    lcd.print("%");
     
-    default:
-        break;
-    }
-        
-
-        
+   
 
 
 }
