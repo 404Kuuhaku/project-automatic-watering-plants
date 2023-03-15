@@ -399,7 +399,7 @@ void Time_LCD_Botton()
 
         case btnSELECT:
         {
-            timerRun = HIGH;
+            timerRun = !timerRun;
             delay(300);
             break;
         }
@@ -599,7 +599,7 @@ void Mode1_LCD_Botton()
 
             else if (V_mode1 == 9)
             {
-                hours_time_setup = (hours_time_setup + 1) % 24;
+                hours_time_setup = (hours_time_setup + 1) % 3;
             }
 
             else if (V_mode1 == 10)
@@ -718,7 +718,7 @@ void Mode1_LCD_Botton()
                 hours_time_setup--;
                 if (hours_time_setup < 0)
                 {
-                    hours_time_setup = 23;
+                    hours_time_setup = 2;
                 }
             }
 
@@ -770,6 +770,12 @@ void Mode1_LCD_Botton()
         case btnSELECT:
         {
             select_Mode = 1;
+                    timeOn = LOW;
+                    modeOn1 = LOW;
+                    modeOn2 = LOW;
+                    modeOn3 = LOW;
+                    modeOn4 = LOW;
+                    modeOn5 = HIGH;
             delay(300);
             break;
         }
@@ -1094,6 +1100,12 @@ void Mode2_LCD_Botton()
                     case btnSELECT:
                     {
                       select_Mode = 2;
+                        timeOn = LOW;
+                        modeOn1 = LOW;
+                        modeOn2 = LOW;
+                        modeOn3 = LOW;
+                        modeOn4 = LOW;
+                        modeOn5 = HIGH;
                        delay(300);
             
                         break;
@@ -1233,28 +1245,23 @@ void Mode3_LCD_Botton(){
         {
               case btnRIGHT:
               {
-                  V_mode3 = (V_mode3+1)%4;
-
-                  delay(300);
+                  //delay(300);
                   break;
               }
       
               case btnLEFT:
               {
-                  V_mode3--;
-                  if (V_mode3 <0)
-                  {
-                    V_mode3 = 3;
-                  }
-      
-                  delay(300);
+                  //delay(300);
                   break;
               }
       
               case btnUP:
               {
                   
-                  //delay(300);
+                  
+                  V_mode3 = (V_mode3+1)%5;
+
+                  delay(300);
       
                   break;
               }
@@ -1262,14 +1269,26 @@ void Mode3_LCD_Botton(){
               case btnDOWN:
               {
                   
-                  //delay(300);
+                  
+                    V_mode3--;
+                  if (V_mode3 <0)
+                  {
+                    V_mode3 = 4;
+                  }
       
+                  delay(300);
                   break;
               }
       
               case btnSELECT:
               {
                   select_Mode = 3;
+                    timeOn = LOW;
+                    modeOn1 = LOW;
+                    modeOn2 = LOW;
+                    modeOn3 = LOW;
+                    modeOn4 = LOW;
+                    modeOn5 = HIGH;
                   delay(300);
                   break;
               }
@@ -1284,17 +1303,21 @@ void Mode3_LCD_Botton(){
         lcd.print("Preset:");
         if (V_mode3 == 0)
         {
-            lcd.print("Vegetable");
+            lcd.print("Orchid   ");
         }
         else if (V_mode3 == 1)
         {
-            lcd.print("Flower   ");
+            lcd.print("Vegetable");
         }
         else if (V_mode3 == 2)
         {
-            lcd.print("Cactus   ");
+            lcd.print("Flower   ");
         }
         else if (V_mode3 == 3)
+        {
+            lcd.print("Cactus   ");
+        }
+        else if (V_mode3 == 4)
         {
             lcd.print("Air Clean");
         }
@@ -1459,19 +1482,19 @@ void Mode5_LCD_Botton(){
         {
             lcd.print("-");
             lcd.setCursor(0,1);
-            lcd.print("Manual         ");
+            lcd.print("Manual          ");
         }
         else if (select_Mode == 1)
         {
             lcd.print("1");
             lcd.setCursor(0,1);
-            lcd.print("Timer          ");
+            lcd.print("Timer           ");
         }
         else if (select_Mode == 2)
         {
             lcd.print("2");
             lcd.setCursor(0,1);
-            lcd.print("Soil Humidity");
+            lcd.print("Humidity        ");
         }
         else if (select_Mode == 3)
         {
@@ -1480,17 +1503,21 @@ void Mode5_LCD_Botton(){
                 lcd.print("Preset:");
                 if (V_mode3 == 0)
                 {
-                    lcd.print("Vegetable");
+                    lcd.print("Orchid   ");
                 }
                 else if (V_mode3 == 1)
                 {
-                    lcd.print("Flower   ");
+                    lcd.print("Vegetable");
                 }
                 else if (V_mode3 == 2)
                 {
-                    lcd.print("Cactus   ");
+                    lcd.print("Flower   ");
                 }
                 else if (V_mode3 == 3)
+                {
+                    lcd.print("Cactus   ");
+                }
+                else if (V_mode3 == 4)
                 {
                     lcd.print("Air Clean");
                 }
@@ -1685,13 +1712,25 @@ void relayControl()
             {
                 digitalWrite(Relay1, LOW);
             }
+            if (no_decimal_h <70)
+            {
+                digitalWrite(Relay2, LOW);
+            }
+        }
+
+        else if (V_mode3 ==1)
+        {
+            if (SoilHumidity <40)
+            {
+                digitalWrite(Relay1, LOW);
+            }
             if (no_decimal_h <40)
             {
                 digitalWrite(Relay2, LOW);
             }
         }
 
-        if (V_mode3 ==1)
+        else if (V_mode3 ==2)
         {
             if (SoilHumidity <50)
             {
@@ -1703,7 +1742,7 @@ void relayControl()
             }
         }
 
-        if (V_mode3 ==2)
+        else if (V_mode3 ==3)
         {
             if (SoilHumidity <20)
             {
@@ -1715,7 +1754,7 @@ void relayControl()
             }
         }
 
-        if (V_mode3 ==3)
+        else if (V_mode3 ==4)
         {
             if (SoilHumidity <25)
             {

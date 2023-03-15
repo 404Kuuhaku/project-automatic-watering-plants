@@ -599,7 +599,7 @@ void Mode1_LCD_Botton()
 
             else if (V_mode1 == 9)
             {
-                hours_time_setup = (hours_time_setup + 1) % 24;
+                hours_time_setup = (hours_time_setup + 1) % 3;
             }
 
             else if (V_mode1 == 10)
@@ -718,7 +718,7 @@ void Mode1_LCD_Botton()
                 hours_time_setup--;
                 if (hours_time_setup < 0)
                 {
-                    hours_time_setup = 23;
+                    hours_time_setup = 2;
                 }
             }
 
@@ -1459,19 +1459,19 @@ void Mode5_LCD_Botton(){
         {
             lcd.print("-");
             lcd.setCursor(0,1);
-            lcd.print("Manual         ");
+            lcd.print("Manual          ");
         }
         else if (select_Mode == 1)
         {
             lcd.print("1");
             lcd.setCursor(0,1);
-            lcd.print("Timer          ");
+            lcd.print("Timer           ");
         }
         else if (select_Mode == 2)
         {
             lcd.print("2");
             lcd.setCursor(0,1);
-            lcd.print("Soil Humidity");
+            lcd.print("Humidity        ");
         }
         else if (select_Mode == 3)
         {
