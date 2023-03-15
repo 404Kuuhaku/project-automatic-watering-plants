@@ -770,12 +770,7 @@ void Mode1_LCD_Botton()
         case btnSELECT:
         {
             select_Mode = 1;
-                    timeOn = LOW;
-                    modeOn1 = LOW;
-                    modeOn2 = LOW;
-                    modeOn3 = LOW;
-                    modeOn4 = LOW;
-                    modeOn5 = HIGH;
+            mode = 5;
             delay(300);
             break;
         }
@@ -1100,12 +1095,7 @@ void Mode2_LCD_Botton()
                     case btnSELECT:
                     {
                       select_Mode = 2;
-                        timeOn = LOW;
-                        modeOn1 = LOW;
-                        modeOn2 = LOW;
-                        modeOn3 = LOW;
-                        modeOn4 = LOW;
-                        modeOn5 = HIGH;
+                        mode = 5;
                        delay(300);
             
                         break;
@@ -1283,12 +1273,9 @@ void Mode3_LCD_Botton(){
               case btnSELECT:
               {
                   select_Mode = 3;
-                    timeOn = LOW;
-                    modeOn1 = LOW;
-                    modeOn2 = LOW;
-                    modeOn3 = LOW;
-                    modeOn4 = LOW;
-                    modeOn5 = HIGH;
+                  mode = 5;
+                  
+                    
                   delay(300);
                   break;
               }
@@ -1480,25 +1467,25 @@ void Mode5_LCD_Botton(){
     lcd.print("You Use Mode:");
         if (select_Mode == 0)
         {
-            lcd.print("-");
+            lcd.print("-  ");
             lcd.setCursor(0,1);
             lcd.print("Manual          ");
         }
         else if (select_Mode == 1)
         {
-            lcd.print("1");
+            lcd.print("1  ");
             lcd.setCursor(0,1);
             lcd.print("Timer           ");
         }
         else if (select_Mode == 2)
         {
-            lcd.print("2");
+            lcd.print("2  ");
             lcd.setCursor(0,1);
             lcd.print("Humidity        ");
         }
         else if (select_Mode == 3)
         {
-            lcd.print("3");
+            lcd.print("3  ");
             lcd.setCursor(0, 1);
                 lcd.print("Preset:");
                 if (V_mode3 == 0)
